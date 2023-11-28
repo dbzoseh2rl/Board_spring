@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ldkspringbase.mapper.BoardMapper">
+
+    <select id="getAllBoards" resultType="com.ldkspringbase.entity.BoardEntity">
+        SELECT *
+        FROM Boards;
+    </select>
+
+    <select id="getBoardById" parameterType="int" resultType="com.ldkspringbase.entity.BoardEntity">
+        SELECT *
+        FROM boards
+        WHERE id = #{id}
+    </select>
+
+    <insert id="createBoard" parameterType="com.ldkspringbase.entity.BoardEntity">
+        INSERT INTO boards(id, user_Name, title, content, nowDay, view_Count)
+        VALUES (#{id}, #{userName}, #{title}, #{content}, #{nowDay}, #{viewCount});
+    </insert>
+
+    <update id="updateBoard" parameterType="com.ldkspringbase.entity.BoardEntity">
+        UPDATE Boards
+        SET user_Name  = #{userName},
+            title      = #{title},
+            content    = #{content},
+            nowDay     = #{nowDay},
+            view_Count = #{viewCount}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteBoard" parameterType="int">
+        DELETE FROM Boards
+        WHERE id = #{id}
+    </delete>
+</mapper>

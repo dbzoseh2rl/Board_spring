@@ -1,57 +1,56 @@
 package com.ldkspringbase.controller;
-import com.ldkspringbase.BoardRepository;
-import com.ldkspringbase.entity.Board;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.ldkspringbase.entity.BoardEntity;
+import com.ldkspringbase.service.BoardService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/boards")
+@RequiredArgsConstructor
 public class BoardController {
+    private final BoardService boardService;
 
-    @Autowired
-    private BoardRepository boardRepository;
-
-    // 모든 게시물 조회
-    @GetMapping
-    public List<Board> getAllBoards() {
-        return boardRepository.findAll();
+    // 전체 목록 조회
+    @GetMapping("/all")
+    public List<BoardEntity> getAllBoards() {
+        return boardService.getAllBoards();
     }
 
-    // 특정 ID의 게시물 조회
+    // 글 하나 조회
     @GetMapping("/{id}")
-    public Board getBoardById(@PathVariable int id) {
-        return boardRepository.findById(id).orElse(null);
+    public BoardEntity getBoardById(@PathVariable int id) {
+        return boardService.getBoardById(id);
     }
 
-    // 게시물 생성
+    // 글 등록
     @PostMapping
-    public Board createBoard(@RequestBody Board board) {
-        return boardRepository.save(board);
+    public BoardEntity createBoard(@RequestBody BoardEntity board) {
+        return boardService.createBoard(board); // Return the created board
     }
 
-    // 게시물 수정
     @PutMapping("/{id}")
-    public Board updateBoard(@PathVariable int id, @RequestBody Board updatedBoard) {
-        Board existingBoard = boardRepository.findById(id).orElse(null);
-        if (existingBoard != null) {
-            existingBoard.setUserName(updatedBoard.getUserName());
-            existingBoard.setTitle(updatedBoard.getTitle());
-            existingBoard.setContent(updatedBoard.getContent());
-            existingBoard.setPostDate(updatedBoard.getPostDate());
-            existingBoard.setViews(updatedBoard.getViews());
-            return boardRepository.save(existingBoard);
+    public ResponseEntity<String> updateBoard(@PathVariable int id, @RequestBody BoardEntity board) {
+        boolean isUpdated = boardService.updateBoard(id, board);
+
+        if (isUpdated) {
+            return ResponseEntity.ok("Board updated successfully");
         } else {
-            return null; // 예외 처리를 추가할 수도 있습니다.
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Board not found with id: " + id);
         }
     }
-
-    // 게시물 삭제
     @DeleteMapping("/{id}")
-    public void deleteBoard(@PathVariable int id) {
-        boardRepository.deleteById(id);
+    public ResponseEntity<String> deleteBoard(@PathVariable int id) {
+        boolean isDeleted = boardService.deleteBoard(id);
+
+        if (isDeleted) {
+            return ResponseEntity.ok("Board deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Board not found with id: " + id);
+        }
     }
 }
-
-
